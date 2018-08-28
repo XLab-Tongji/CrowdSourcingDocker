@@ -1,0 +1,11 @@
+{
+    "user": {
+        "status": 200,
+        "result": {
+            "tokenid": 1,
+            "realname": "wujie",
+            "mobile": "123456",
+            "email": "123@qq.com"
+        }
+    }
+}
