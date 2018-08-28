@@ -38,6 +38,6 @@ cd ..
 
 mv mart-vue/dist/ dist/
 
-docker build -t txhsl/crowdsourcing-vue-docker .
+docker build -t nee11235/crowdsourcing-mart-frontend .
 
-docker run -d -p 80:80 txhsl/crowdsourcing-vue-docker
+docker run -d -p 80:80 nee11235/crowdsourcing-mart-frontend
