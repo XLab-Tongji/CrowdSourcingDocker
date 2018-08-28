@@ -43,7 +43,7 @@ module.exports = {
             //     }
             // }
             '/api' :{
-                target: 'http://10.60.38.173:3000',
+                target: 'http://172.16.101.90:30001',
                 changeOrigin:true,
                 pathRewrite:{
                     '^/api': '/api'
