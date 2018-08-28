@@ -5,7 +5,7 @@ module.exports = {
     // dev server
     // url: '',
     // production server
-    url: 'http://localhost:30001',
+    url: 'http://172.16.101.90:30001',
     estimation: 'http://10.60.38.173:8011',
     build: {
         env: require('./prod.env'),
