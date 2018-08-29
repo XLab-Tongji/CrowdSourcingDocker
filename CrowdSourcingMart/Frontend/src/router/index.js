@@ -10,6 +10,17 @@ import ProjectDetail from '@/views/ProjectDetail'
 import Workers from '@/views/Workers'
 import store from '../vuex/store'
 
+import StepOne from '@/views/user/StepOne'
+import StepTwo from '@/views/user/StepTwo'
+import StepThree from '@/views/user/StepThree'
+import StepFour from '@/views/user/StepFour'
+import VER from  '@/views/user/view_estimated_report'
+import MVER from '@/views/manager/ManagerEstView_report'
+import ManagerStepTwo from '@/views/manager/ManagerStepTwo'
+import ManagerStepThree from '@/views/manager/ManagerStepThree'
+import ManagerIFPUGReport from '@/views/manager/ManagerReport'
+import FunctionDiv from '@/views/manager/FunctionDiv'
+
 // 引入样式
 import 'vue-easytable/libs/themes-base/index.css'
 // 导入 table 和 分页组件
@@ -56,6 +67,76 @@ const router = new Router({
         path:'/workers',
         name:"Workers",
         component: Workers
+    },{
+        path: '/stepone/:rId',
+        name: 'StepOne',
+        meta: {
+            requireAuth: true
+        },
+        component: StepOne
+    },{
+        path: '/steptwo/:rId',
+        name: 'StepTwo',
+        meta: {
+            requireAuth: true
+        },
+        component: StepTwo
+    },{
+        path: '/ver',
+        name: 'VER',
+        meta: {
+            requireAuth: true
+        },
+        component: VER
+    },{
+        path: '/mver',
+        name: 'MVER',
+        meta: {
+            requireAuth: true
+        },
+        component: MVER
+    },{
+        path: '/stepthree/:rId',
+        name: 'StepThree',
+        meta: {
+            requireAuth: true
+        },
+        component:StepThree
+    },{
+        path: '/stepfour',
+        name: 'StepFour',
+        meta: {
+            requireAuth: true
+        },
+        component:StepFour
+    },{
+        path: '/managersteptwo/:rId',
+        name: 'ManagerStepTwo',
+        meta: {
+            requireAuth: true
+        },
+        component:ManagerStepTwo
+    },{
+        path: '/managerstepthree/:rId',
+        name: 'ManagerStepThree',
+        meta: {
+            requireAuth: true
+        },
+        component:ManagerStepThree
+    },{
+        path: '/managerIFPUGreport/:rId',
+        name: 'ManagerIFPUGReport',
+        meta: {
+            requireAuth: true
+        },
+        component:ManagerIFPUGReport
+    },{
+        path: '/functiondiv/:rId',
+        name: 'FunctionDiv',
+        meta: {
+            requireAuth: true
+        },
+        component:FunctionDiv
     }]
 })
 

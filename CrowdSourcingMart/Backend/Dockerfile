@@ -1,6 +1,6 @@
 FROM frolvlad/alpine-oraclejdk8:slim
 
-MAINTAINER txhsl <teumessian@qq.com>
+MAINTAINER nee <nee_11235@qq.com>
 
 VOLUME /tmp
 

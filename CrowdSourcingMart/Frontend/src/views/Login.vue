@@ -67,6 +67,37 @@
         else {
           var self = this;
           login(this.url, {"username": this.account, "password": this.pwd}, this);
+
+          // estimation
+          var estimationUrl = 'http://120.79.245.126:8011/estimation/login'
+          var estimationData = {
+              "username": this.account,
+              "password": this.pwd
+          }
+          axios.post(estimationUrl, estimationData).then(response => {
+            console.log(response)
+            if (response.data.status == 200) {
+              this.$message({
+              message: ('登录成功'),
+              type: 'success'
+              });
+              this.$store.commit('setToken', response.data.result.tokenid);
+              this.$store.commit('setUsername', this.account);
+
+              this.$store.commit('setRealname', response.data.result.realname);
+              this.$store.commit('setMobile', response.data.result.mobile);
+              this.$store.commit('setEmail', response.data.result.email);
+
+              sessionStorage.setItem('tokenid', response.data.result.tokenid);
+              sessionStorage.setItem('username', this.account);
+              sessionStorage.setItem('realname', response.data.result.realname);
+              sessionStorage.setItem('mobile', response.data.result.mobile);
+              sessionStorage.setItem('email', response.data.result.email);
+
+              this.account = '';
+              this.pwd = '';
+            }
+          })
         }
         this.button_disabled = false;
       }
