@@ -36,11 +36,11 @@ public class VAFController {
 	@RequestMapping(value = "/addVAF/{id}", method = RequestMethod.POST)
 	public Object addVAF(HttpServletRequest request, @RequestBody JSONObject jsonObject, @PathVariable String id) {
         HttpStatus status = HttpStatus.ACCEPTED;
-		String userId = requirementService.getAccount(request);
-		if(!requirementService.checkIdentity(id, userId)) {
-            status = HttpStatus.INTERNAL_SERVER_ERROR;
-            return new ResponseEntity<Object>("",status);
-        }
+//		String userId = requirementService.getAccount(request);
+//		if(!requirementService.checkIdentity(id, userId)) {
+//            status = HttpStatus.INTERNAL_SERVER_ERROR;
+//            return new ResponseEntity<Object>("",status);
+//        }
 		VAF vaf = new VAF();
 		String developmentType = jsonObject.getString("developmentType");
 		String developmentPlatform = jsonObject.getString("developmentPlatform");
@@ -77,13 +77,8 @@ public class VAFController {
 	}
 
 	@RequestMapping(value = "/changeVAF/{id}", method = RequestMethod.POST)
-	public Object changeVAF(HttpServletRequest request, @RequestBody JSONObject jsonObject, @PathVariable String id) {
+	public Object changeVAF(@RequestBody JSONObject jsonObject, @PathVariable String id) {
         HttpStatus status = HttpStatus.ACCEPTED;
-        String userId = requirementService.getAccount(request);
-		if(!managerService.judgeIdentity(userId) && !requirementService.checkIdentity(id, userId)) {
-            status = HttpStatus.INTERNAL_SERVER_ERROR;
-            return new ResponseEntity<Object>("",status);
-        }
 		Map<Object, Object> msg = new HashMap<>();
 		try {
 			VAF vaf = new VAF();

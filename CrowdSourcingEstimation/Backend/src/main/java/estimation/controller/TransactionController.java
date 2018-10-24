@@ -34,10 +34,7 @@ public class TransactionController {
 
     //增加一个新事务
     @RequestMapping(value = "/addTransaction/{id}",method = RequestMethod.POST)
-    public void addTransaction(HttpServletRequest request, @RequestBody JSONObject jsonObject, @PathVariable String id) {
-        String userId = requirementService.getAccount(request);
-        if(!managerService.judgeIdentity(userId) && !requirementService.checkIdentity(id, userId))
-            return;
+    public void addTransaction(@RequestBody JSONObject jsonObject, @PathVariable String id) {
         Transaction transaction = new Transaction();
         String transactionName = jsonObject.getString("transactionName");
         String transactionId = jsonObject.getString("tId");
@@ -151,12 +148,9 @@ public class TransactionController {
         transactionService.add(id, transaction);
     }
 
-    
+
     @RequestMapping(value = "/addTree/{id}", method = RequestMethod.POST)
-    public void addAllTree(HttpServletRequest request, @RequestBody JSONObject jsonObject, @PathVariable String id) {
-        String userId = requirementService.getAccount(request);
-        if(!managerService.judgeIdentity(userId) && !requirementService.checkIdentity(id, userId))
-            return;
+    public void addAllTree(@RequestBody JSONObject jsonObject, @PathVariable String id) {
         JSONObject tree = jsonObject.getJSONObject("tree");
     	Folder folder = new Folder();
     	folder.setName(tree.getString("name"));
@@ -167,10 +161,10 @@ public class TransactionController {
     	transactionService.updateTransactionList(id, tIds);
     	transactionService.addTree(id, folder);
     }
-    
-    @RequestMapping(value = "/getTree/{id}", method = RequestMethod.GET)
-    public Object getTree(HttpServletRequest request, @PathVariable String id) {
-        String userId = requirementService.getAccount(request);
+
+    @RequestMapping(value = "/getTree/{id}", method = RequestMethod.POST)
+    public Object getTree(@RequestBody Account account, @PathVariable String id) {
+        String userId = account.getUsername();
         Requirement requirement = requirementService.getRequirement(id);
         if(!managerService.judgeIdentity(userId) && !requirementService.checkIdentity(id, userId))
             return null;
@@ -180,16 +174,13 @@ public class TransactionController {
         jsonObject.accumulate("ilfTable", requirement.getAllILFData());
         return jsonObject;
     }
-    
+
     @RequestMapping(value = "/addFile/{id}", method = RequestMethod.POST)
-    public void addFile(HttpServletRequest request, @RequestBody JSONObject jsonObject, @PathVariable String id) {
-        String userId = requirementService.getAccount(request);
-        if(!managerService.judgeIdentity(userId) && !requirementService.checkIdentity(id, userId))
-            return;
+    public void addFile(@RequestBody JSONObject jsonObject, @PathVariable String id) {
     	String name = jsonObject.getString("name");
     	String tId = jsonObject.getString("id");
     	transactionService.addFile(id, name, tId);
-    	
+
     	JSONObject tree = jsonObject.getJSONObject("tree");
     	Folder folder = new Folder();
     	folder.setName(tree.getString("name"));
@@ -197,18 +188,15 @@ public class TransactionController {
     	transactionService.buildTree(folder, tree);
     	transactionService.addTree(id, folder);
     }
-    
+
     @RequestMapping(value = "/getTransaction/{id}", method = RequestMethod.POST)
-    public Object geTransaction(HttpServletRequest request, @RequestBody JSONObject jsonObject,@PathVariable String id) {
-        String userId = requirementService.getAccount(request);
-        if(!managerService.judgeIdentity(userId) && !requirementService.checkIdentity(id, userId))
-            return null;
+    public Object geTransaction(@RequestBody JSONObject jsonObject, @PathVariable String id) {
     	String tId = jsonObject.getString("tId");
         JSONObject jsonObject2 = new JSONObject().fromObject(transactionService.geTransaction(id, tId));
         jsonObject2.accumulate("estimationFileDatas", requirementService.getRequirement(id).getEstimationFileDatas());
     	return jsonObject2;
     }
-    
+
     @RequestMapping(value = "/deleteTransaction/{id}", method = RequestMethod.POST)
     public void deleteTransaction(HttpServletRequest request, @RequestBody JSONObject jsonObject,@PathVariable String id) {
         String tId = jsonObject.getString("tId");
@@ -217,30 +205,25 @@ public class TransactionController {
             return;
     	transactionService.deleteTransaction(id, tId);
     }
-    
+
     @RequestMapping(value = "/updateTransaction/{id}", method = RequestMethod.POST)
-    public void updateTransaction(HttpServletRequest request, @RequestBody JSONObject jsonObject,@PathVariable String id) {
+    public void updateTransaction(@RequestBody JSONObject jsonObject,@PathVariable String id) {
         String tId = jsonObject.getString("tId");
 
         Transaction transaction = transactionService.geTransaction(id, tId);
         List<EstimationTransactionData> eTDs =  transaction.getEstimationTransactionDatas();
     	transactionService.deleteTransaction(id, tId);
-    	addTransaction(request, jsonObject, id);
+    	addTransaction(jsonObject, id);
     	transactionService.updateETDs(id, tId, eTDs);
     	JSONArray jsonArray = jsonObject.getJSONArray("ILFTable");
         transactionService.updateILFAndEIFData(id, jsonArray, 1);
         jsonArray = jsonObject.getJSONArray("EIFTable");
         transactionService.updateILFAndEIFData(id, jsonArray, 2);
     }
-    
+
     @RequestMapping(value = "/TransactionReName/{id}", method = RequestMethod.POST)
-    public Object TransactionReName(HttpServletRequest request, @RequestBody JSONObject jsonObject,@PathVariable String id) {
-        String userId = requirementService.getAccount(request);
+    public Object TransactionReName(@RequestBody JSONObject jsonObject,@PathVariable String id) {
         HttpStatus status = HttpStatus.ACCEPTED;
-        if(!managerService.judgeIdentity(userId) && !requirementService.checkIdentity(id, userId)){
-            status = HttpStatus.INTERNAL_SERVER_ERROR;
-            return new ResponseEntity<String>("",status);
-        }
     	String tId = jsonObject.getString("tId");
     	String tName = jsonObject.getString("tName");
     	if(tName.equals("")){

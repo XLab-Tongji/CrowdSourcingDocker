@@ -1,5 +1,6 @@
 package estimation.controller;
 
+import estimation.bean.Account;
 import estimation.bean.Manager;
 import estimation.service.ManagerService;
 import estimation.service.RequirementService;
@@ -32,12 +33,11 @@ public class ManagerController {
     @Autowired
     RequirementService requirementService;
 
-    @GetMapping(value = "/identity")
-    public Object judgeIdentity(HttpServletRequest request){
+    @PostMapping(value = "/identity")
+    public Object judgeIdentity(@RequestBody Account account){
         Map<String, Object> result = new HashMap<>();
-        System.out.println(request);
         try{
-            String username = requirementService.getAccount(request);
+            String username = account.getUsername();
             if(username != null){
                 result.put("code", managerService.judgeIdentity(username) ? 0 : 1);
             }

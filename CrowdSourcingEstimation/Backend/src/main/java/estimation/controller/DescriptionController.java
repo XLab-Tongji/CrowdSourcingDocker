@@ -31,11 +31,11 @@ public class DescriptionController {
 
     //添加描述信息或更新现有的描述信息
     @RequestMapping(value = "/addDescription/{id}",method = RequestMethod.POST)
-    public Object addDescription(HttpServletRequest request, @RequestBody JSONObject jsonObject, @PathVariable String id) {
+    public Object addDescription(@RequestBody JSONObject jsonObject, @PathVariable String id) {
         String userId = "@";
         Map<String,Object> result = new HashMap<>();
         try {
-            userId = requirementService.getAccount(request);
+            userId = jsonObject.getString("username");
         } catch (Exception e){
             e.printStackTrace();
             return -1;

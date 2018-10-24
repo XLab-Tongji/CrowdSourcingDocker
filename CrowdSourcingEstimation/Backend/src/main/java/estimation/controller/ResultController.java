@@ -3,6 +3,7 @@ package estimation.controller;
 import java.util.ArrayList;
 import java.util.List;
 
+import estimation.bean.*;
 import estimation.service.ManagerService;
 import estimation.service.RequirementService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,10 +13,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import estimation.bean.EstimationFileData;
-import estimation.bean.EstimationTransactionData;
-import estimation.bean.Requirement;
-import estimation.bean.Transaction;
 import estimation.service.ResultService;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -33,17 +30,14 @@ public class ResultController {
 
 	@Autowired
 	private ManagerService managerService;
-	
+
 	@RequestMapping(value = "/updateResult/{id}",method = RequestMethod.POST)
-	public Object updateResult(HttpServletRequest request, @RequestBody JSONObject jsonObject, @PathVariable String id) {
-		String userId = requirementService.getAccount(request);
-		if(!managerService.judgeIdentity(userId) && !requirementService.checkIdentity(id, userId))
-			return null;
+	public Object updateResult(@RequestBody JSONObject jsonObject, @PathVariable String id) {
 
 		JSONArray TransactionArray = jsonObject.getJSONArray("eTDs");
 		JSONArray FileArray = jsonObject.getJSONArray("eFDs");
 		String tId = jsonObject.getString("tId");
-		
+
 		List<EstimationTransactionData> eTDs = new ArrayList<>();
 		for(int i = 0;i < TransactionArray.size();i++) {
 			EstimationTransactionData eTD = new EstimationTransactionData();
@@ -56,7 +50,7 @@ public class ResultController {
 			String detNumStr = transactionData.getString("detNum");
 			int fileNum = new Integer(fileNumStr);
 			int detNum = new Integer(detNumStr);
-			
+
 			eTD.setName(name);
 			eTD.setTransactionType(transactionType);
 			eTD.setLogicalFile(logicalFile);
@@ -66,7 +60,7 @@ public class ResultController {
 			resultService.calTransactionComplexity(eTD);
 			eTDs.add(eTD);
 		}
-		
+
 		List<EstimationFileData> eFDs = new ArrayList<EstimationFileData>();
 		for(int i = 0;i < FileArray.size();i++) {
 			EstimationFileData eFD = new EstimationFileData();
@@ -77,10 +71,10 @@ public class ResultController {
 			String dET = fileData.getString("DET");
 			String retNumStr = fileData.getString("retNum");
 			String detNumStr = fileData.getString("detNum");
-			
+
 			int retNum = new Integer(retNumStr);
 			int detNum = new Integer(detNumStr);
-			
+
 			eFD.setName(name);
 			eFD.setFileType(fileType);
 			eFD.setRET(RET);
@@ -90,16 +84,16 @@ public class ResultController {
 			resultService.calFileComplexity(eFD);
 			eFDs.add(eFD);
 		}
-		
+
 		JSONObject msg = new JSONObject().fromObject(resultService.updateResult(id, tId, eFDs, eTDs));
 		msg.accumulate("estimationFileDatas", requirementService.getRequirement(id).getEstimationFileDatas());
 		return msg;
 	}
-	
-	@RequestMapping(value = "/getReport/{id}",method = RequestMethod.GET)
-	public JSONObject getReport(HttpServletRequest request, @PathVariable String id) {
-		String userId = requirementService.getAccount(request);
-		if(!managerService.judgeIdentity(userId) && !requirementService.checkIdentity(id, userId))
+
+	@RequestMapping(value = "/getReport/{id}",method = RequestMethod.POST )
+	public JSONObject getReport(@RequestBody Account account, @PathVariable String id) {
+		String userId = account.getUsername();
+		if(!managerService.judgeIdentity(userId))
 			return null;
 		Requirement requirement = resultService.getReport(id);
 		JSONObject jsonObject = new JSONObject().fromObject(requirement);

@@ -1,6 +1,7 @@
 package estimation.controller;
 
 
+import estimation.bean.Account;
 import estimation.bean.Requirement;
 import estimation.service.ManagerService;
 import estimation.service.RequirementService;
@@ -12,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -30,9 +32,10 @@ public class RequirementController {
     private ManagerService managerService;
 
     //增加一个新需求
-    @RequestMapping(value = "/addRequirement",method = RequestMethod.GET)
-    public Object addRequirement(HttpServletRequest request) {
-        String userId = requirementService.getAccount(request);
+    @RequestMapping(value = "/addRequirement",method = RequestMethod.POST)
+    @ResponseBody
+    public Object addRequirement(@RequestBody Map<String, String> map) {
+        String userId = map.get("username");
         if(userId == null){
             HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
             return new ResponseEntity<String>("",status);
@@ -41,29 +44,28 @@ public class RequirementController {
     }
 
     //返回一条记录
-    @RequestMapping(value = "/getRequirement/{id}",method = RequestMethod.GET)
-    public Requirement getRequirement(HttpServletRequest request, @PathVariable String id) {
-        String userId = requirementService.getAccount(request);
-        if(!managerService.judgeIdentity(userId) && !requirementService.checkIdentity(id, userId))
-            return null;
+    @RequestMapping(value = "/getRequirement/{id}")
+    @ResponseBody
+    public Requirement getRequirement(@RequestBody(required = false) Account account, @PathVariable String id) {
         return requirementService.getRequirement(id);
     }
 
     //返回所有记录
-    @RequestMapping(value = "/getAllRequirementsByUser",method = RequestMethod.GET)
-    public Object getAllRequirementsByUser(HttpServletRequest request) {
-        String userId = requirementService.getAccount(request);
-        if(userId == null){
+    @RequestMapping(value = "/getAllRequirementsByUser",method = RequestMethod.POST)
+    @ResponseBody
+    public Object getAllRequirementsByUser(@RequestBody Account account) {
+        String username = account.getUsername();
+        if(username == null){
             HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
             return new ResponseEntity<Object>("",status);
         }
-        return requirementService.getAllRequirementsByUser(userId);
+        return requirementService.getAllRequirementsByUser(username);
     }
 
     //返回所有记录
-    @RequestMapping(value = "/getAllRequirements",method = RequestMethod.GET)
-    public Object getAllRequirements(HttpServletRequest request) {
-        String userId = requirementService.getAccount(request);
+    @RequestMapping(value = "/getAllRequirements",method = RequestMethod.POST)
+    public Object getAllRequirements(@RequestBody Account account) {
+        String userId = account.getUsername();
         if(!managerService.judgeIdentity(userId)) {
             HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
             return new ResponseEntity<Object>("",status);
@@ -72,21 +74,16 @@ public class RequirementController {
     }
 
     @RequestMapping(value = "/deleteRequirement/{id}", method = RequestMethod.POST)
-    public void deleteRequirement(HttpServletRequest request, @PathVariable String id) {
-        String userId = requirementService.getAccount(request);
+    public void deleteRequirement(@RequestBody Account account, @PathVariable String id) {
+        String userId = account.getUsername();
         if(!requirementService.checkIdentity(id, userId))
             return;
         this.requirementService.deleteRequirement(id);
     }
-    
+
     @RequestMapping(value = "/changeState/{id}", method = RequestMethod.POST)
     public Object changeState(HttpServletRequest request, @RequestBody JSONObject jsonObject,@PathVariable String id) {
         HttpStatus status = HttpStatus.ACCEPTED;
-        String userId = requirementService.getAccount(request);
-        if(!managerService.judgeIdentity(userId)) {
-            status = HttpStatus.INTERNAL_SERVER_ERROR;
-            return new ResponseEntity<Object>("", status);
-        }
         String state = jsonObject.getString("state");
         String[] trueState = {"待审核","待修改","完成","估算中"};
         Boolean flag = false;
